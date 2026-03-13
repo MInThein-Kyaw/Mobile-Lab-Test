@@ -38,6 +38,7 @@ export function CheckinScreen({ navigation }: Props) {
 	const [expectedTopic, setExpectedTopic] = useState("");
 	const [selectedMood, setSelectedMood] = useState<number>(0);
 	const [isSubmitting, setIsSubmitting] = useState(false);
+	const [lastCheckinMessage, setLastCheckinMessage] = useState<string | null>(null);
 
 	const locationText = useMemo(() => {
 		if (!location) return null;
@@ -73,6 +74,7 @@ export function CheckinScreen({ navigation }: Props) {
 			};
 
 			await insertCheckin(record);
+			setLastCheckinMessage(`Checked in at ${new Date(now).toLocaleString()}`);
 
 			Alert.alert("Success", "Check-in recorded!", [
 				{
@@ -152,6 +154,8 @@ export function CheckinScreen({ navigation }: Props) {
 				>
 					<Text style={styles.primaryButtonText}>{isSubmitting ? "Submitting..." : "Submit Check-in"}</Text>
 				</TouchableOpacity>
+
+					{lastCheckinMessage ? <Text style={styles.successText}>{lastCheckinMessage}</Text> : null}
 			</ScrollView>
 
 			<QRScannerModal

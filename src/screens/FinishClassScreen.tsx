@@ -35,6 +35,7 @@ export function FinishClassScreen({ navigation }: Props) {
 	const [learnedToday, setLearnedToday] = useState("");
 	const [classFeedback, setClassFeedback] = useState("");
 	const [isSubmitting, setIsSubmitting] = useState(false);
+	const [lastFinishMessage, setLastFinishMessage] = useState<string | null>(null);
 
 	const locationText = useMemo(() => {
 		if (!location) return null;
@@ -56,14 +57,16 @@ export function FinishClassScreen({ navigation }: Props) {
 				return;
 			}
 
+			const finishTime = new Date().toISOString();
 			await updateCheckout(latest.recordId, {
-				checkoutTimestamp: new Date().toISOString(),
+				checkoutTimestamp: finishTime,
 				checkoutLat: location.latitude,
 				checkoutLng: location.longitude,
 				qrCodeValue,
 				learnedToday,
 				classFeedback: classFeedback.trim() ? classFeedback : null,
 			});
+			setLastFinishMessage(`Finished at ${new Date(finishTime).toLocaleString()}`);
 
 			Alert.alert("Done!", "Class session completed!", [
 				{
@@ -138,6 +141,8 @@ export function FinishClassScreen({ navigation }: Props) {
 				>
 					<Text style={styles.primaryButtonText}>{isSubmitting ? "Submitting..." : "Finish Class ✓"}</Text>
 				</TouchableOpacity>
+
+					{lastFinishMessage ? <Text style={styles.successText}>{lastFinishMessage}</Text> : null}
 			</ScrollView>
 
 			<QRScannerModal

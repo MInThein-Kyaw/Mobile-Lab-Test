@@ -30,6 +30,7 @@ export function LoginScreen({ navigation }: Props) {
 	const [password, setPassword] = useState("");
 	const [mode, setMode] = useState<"login" | "signup">("login");
 	const [loading, setLoading] = useState(false);
+	const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
 	const handleSubmit = useCallback(async () => {
 		if (!username.trim() || !email.trim() || !password.trim()) {
@@ -38,6 +39,7 @@ export function LoginScreen({ navigation }: Props) {
 		}
 
 		setLoading(true);
+		setErrorMessage(null);
 		try {
 			const { auth } = getFirebaseApp();
 			const trimmedEmail = email.trim();
@@ -55,6 +57,7 @@ export function LoginScreen({ navigation }: Props) {
 			navigation.replace("Home");
 		} catch (error: any) {
 			const message = typeof error?.message === "string" ? error.message : "Authentication failed";
+			setErrorMessage(message);
 			Alert.alert("Auth error", message);
 		} finally {
 			setLoading(false);
@@ -128,6 +131,8 @@ export function LoginScreen({ navigation }: Props) {
 								{loading ? "Please wait..." : mode === "login" ? "Login" : "Sign Up"}
 							</Text>
 						</TouchableOpacity>
+
+						{errorMessage ? <Text style={styles.errorText}>{errorMessage}</Text> : null}
 
 						<TouchableOpacity onPress={toggleMode} style={styles.switchRow}>
 							<Text style={styles.switchText}>
@@ -230,5 +235,11 @@ const styles = StyleSheet.create({
 		color: COLORS.primary,
 		fontWeight: "700",
 		fontSize: FONTS.sm,
+	},
+	errorText: {
+		marginTop: 12,
+		color: COLORS.danger,
+		fontSize: FONTS.sm,
+		textAlign: "center",
 	},
 });
